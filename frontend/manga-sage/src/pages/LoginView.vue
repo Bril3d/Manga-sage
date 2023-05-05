@@ -97,10 +97,12 @@ export default {
     },
     methods:{
         Login(){
-            axios.post("http://localhost:3000/user",{
-                username:"newUser",
+            axios.post("http://localhost:3000/login",{
                 email:this.email,
                 password:this.password
+            }).then((response)=> {
+              let { data } = response
+              localStorage.setItem('token', data.token)
             })
         }
     }

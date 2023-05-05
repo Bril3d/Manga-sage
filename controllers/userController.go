@@ -3,8 +3,12 @@ package controllers
 import (
 	"manga-sage/initializers"
 	"manga-sage/models"
+	"net/http"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func UserCreate(c *gin.Context) {
@@ -16,7 +20,14 @@ func UserCreate(c *gin.Context) {
 	}
 
 	c.Bind(&body)
-	user := models.User{Username: body.Username, Email: body.Email, Password: body.Password}
+
+	hash, err := HashPassword(body.Password)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	user := models.User{Username: body.Username, Email: body.Email, Password: string(hash)}
 
 	result := initializers.DB.Create(&user)
 	if result.Error != nil {
@@ -28,14 +39,45 @@ func UserCreate(c *gin.Context) {
 	})
 }
 
-func FindByEmail(email string) (*models.User, error) {
-	var user models.User
-	result := initializers.DB.Where("email = ?", email).First(&user)
-	if result.Error != nil {
-		return nil, result.Error
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func UserLogin(c *gin.Context) {
+
+	var body struct {
+		Email    string
+		Password string
 	}
 
-	return &user, nil
+	c.Bind(&body)
+
+	var user models.User
+	result := initializers.DB.Where(&models.User{Email: body.Email}).First(&user)
+
+	if result.Error != nil || !CheckPasswordHash(body.Password, user.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": user.Email,
+		"exp":   time.Now().Add(time.Hour * 1).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to sign token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
 
 func Update() error {

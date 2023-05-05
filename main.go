@@ -28,6 +28,7 @@ func main() {
 	r.GET("/manga/:id", controllers.MangaShow)
 	r.PUT("/manga/:id", controllers.MangaUpdate)
 	r.DELETE("/manga/:id", controllers.MangaDelete)
-	r.POST("/user", controllers.UserCreate)
+	r.POST("/register", controllers.UserCreate)
+	r.POST("/login", controllers.UserLogin)
 	r.Run()
 }
