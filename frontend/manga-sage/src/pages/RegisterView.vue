@@ -1,4 +1,5 @@
 <template>
+  <FeedLayout>
   <div class="h-full">
     <div class="dark:bg-slate-900 bg-gray-100 flex h-full items-center py-16">
       <main class="w-full max-w-md mx-auto p-6">
@@ -250,6 +251,7 @@
       </main>
     </div>
   </div>
+</FeedLayout>
 </template>
 
 <script>

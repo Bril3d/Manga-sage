@@ -1,21 +1,19 @@
 <template>
-    <div>
-        <HeroSlider class="drop-shadow-xl"/>
-        <BestOfView/>
-    </div>
+  <FeedLayout>
+    <HeroSlider class="drop-shadow-xl" />
+    <BestOfView />
+  </FeedLayout>
 </template>
 
 <script>
-import HeroSlider from '../components/HeroSlider.vue';
+import HeroSlider from '../components/HeroSlider.vue'
 import BestOfView from '../components/BestOfView.vue'
-    export default {
-        components:{
-            HeroSlider,
-            BestOfView
-        }
-    }
+export default {
+  components: {
+    HeroSlider,
+    BestOfView,
+  }
+}
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
