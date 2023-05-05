@@ -4,7 +4,8 @@ import "gorm.io/gorm"
 
 type Chapter struct {
 	gorm.Model
-	Title string
+	Title      string
 	Translator string
-	Page []Page
+	MangaID    uint
+	Pages      []Page `gorm:"foreignKey:ChapterID"`
 }

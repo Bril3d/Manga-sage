@@ -9,5 +9,5 @@ type Manga struct {
 	Genre       string
 	Description string
 	Cover_Image string
-	Chapters    []Chapter
+	Chapters    []Chapter `gorm:"foreignKey:MangaID"`
 }

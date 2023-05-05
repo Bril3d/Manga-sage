@@ -4,6 +4,7 @@ import (
 	"manga-sage/initializers"
 	"manga-sage/models"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -66,7 +67,7 @@ func UserLogin(c *gin.Context) {
 		"exp":   time.Now().Add(time.Hour * 1).Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte("secret"))
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to sign token"})
 		return

@@ -4,5 +4,6 @@ import "gorm.io/gorm"
 
 type Page struct {
 	gorm.Model
-	Image string
+	Image     string
+	ChapterID uint
 }

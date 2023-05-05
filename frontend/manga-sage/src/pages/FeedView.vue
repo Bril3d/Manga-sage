@@ -1,6 +1,6 @@
 <template>
     <div>
-        <HeroSlider/>
+        <HeroSlider class="drop-shadow-xl"/>
         <BestOfView/>
     </div>
 </template>

@@ -12,8 +12,7 @@ import (
 func init() {
 	initializers.LoadEnvVariables()
 	initializers.ConnectDB()
-	initializers.DB.AutoMigrate(&models.Manga{})
-	initializers.DB.AutoMigrate(&models.User{})
+	initializers.DB.AutoMigrate(&models.Manga{}, &models.User{}, &models.Chapter{}, &models.Comment{}, &models.Page{}, &models.Rating{})
 }
 
 func main() {

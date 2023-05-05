@@ -4,8 +4,11 @@ import "gorm.io/gorm"
 
 type Rating struct {
 	gorm.Model
-	User User
-	Manga Manga
-	Chapter Chapter
-	Score int
+	UserID    int
+	User      User
+	MangaID   int
+	Manga     Manga
+	ChapterID int
+	Chapter   Chapter
+	Score     int
 }
