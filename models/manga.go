@@ -4,6 +4,10 @@ import "gorm.io/gorm"
 
 type Manga struct {
 	gorm.Model
-	Title string
+	Title       string
+	Author      string
+	Genre       string
 	Description string
+	Cover_Image string
+	Chapters    []Chapter
 }
