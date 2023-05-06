@@ -41,12 +41,12 @@ func main() {
 
 	// Scrape AresManga website for new manga chapters
 	go func() {
-		var newChapter []models.Chapter
 
 		for {
 			Manga := scrapeAresManga()
 
 			for _, m := range Manga {
+				var newChapter []models.Chapter
 
 				var chapter string
 				var ChapterLength int
@@ -70,20 +70,26 @@ func main() {
 						Number: chapter,
 					})
 				}
+				var existingManga models.Manga
+				DBresult := initializers.DB.Where("title = ?", m.Title).First(&existingManga)
+				if DBresult.Error != nil {
+					filepath := "./manga/" + m.Title + "/cover.jpg"
+					downloadImage(m.Cover, filepath)
 
-				filepath := "./manga/" + m.Title + "/cover.jpg"
-				downloadImage(m.Cover, filepath)
+					MangaClone := &models.Manga{
+						Title:       m.Title,
+						Cover_Image: filepath,
+						Chapters:    newChapter,
+					}
+					fmt.Println(newChapter)
+					result := initializers.DB.Create(MangaClone)
 
-				MangaClone := &models.Manga{
-					Title:       m.Title,
-					Cover_Image: filepath,
-					Chapters:    newChapter,
-				}
-
-				result := initializers.DB.Create(MangaClone)
-
-				if result.Error != nil {
-					log.Fatal(result.Error)
+					if result.Error != nil {
+						log.Fatal(result.Error)
+					}
+				} else {
+					// Manga already exists in database, do nothing
+					log.Printf("Manga '%s' already exists in database, skipping", m.Title)
 				}
 			}
 
@@ -160,7 +166,7 @@ func downloadChapter(url string, title string) (string, int) {
 	chapter := getChapterNumber(url)
 
 	// Create directory to store chapter images
-	err = os.MkdirAll("./manga/"+title+"/"+chapter, 0755)
+	err = createDirectoryIfNotExist("./manga/" + title + "/" + chapter)
 
 	if err != nil {
 		return "", 0
@@ -189,6 +195,26 @@ func downloadChapter(url string, title string) (string, int) {
 
 	return chapter, ChapterLength
 }
+
+func createDirectoryIfNotExist(dir string) error {
+	_, err := os.Stat(dir)
+	if err == nil {
+		// directory exists, do nothing
+		return nil
+	}
+	if os.IsNotExist(err) {
+		// directory does not exist, create it
+		err = os.MkdirAll(dir, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	} else {
+		// unexpected error occurred while checking if directory exists
+		return err
+	}
+	return nil
+}
+
 func getChapterNumber(url string) string {
 	// Get chapter number from URL
 	re := regexp.MustCompile(`/*-chapter-(\d+)/`)
