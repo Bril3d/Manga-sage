@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Manga struct {
 	gorm.Model
-	Title       string
+	Title       string `gorm:"unique;not null"`
 	Author      string
 	Genre       string
 	Description string
