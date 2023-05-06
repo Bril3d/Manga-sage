@@ -197,12 +197,15 @@ func downloadChapter(url string, title string) (string, int) {
 }
 
 func createDirectoryIfNotExist(dir string) error {
-	_, err := os.Stat(dir)
+	_, err := os.Stat(string(dir))
+
 	if err == nil {
+		fmt.Println("directory exists " + dir)
 		// directory exists, do nothing
 		return nil
 	}
 	if os.IsNotExist(err) {
+		fmt.Println("directory doesnt exists " + dir)
 		// directory does not exist, create it
 		err = os.MkdirAll(dir, os.ModePerm)
 		if err != nil {
