@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"manga-sage/initializers"
 	"manga-sage/models"
 
@@ -28,11 +29,24 @@ func MangaCreate(c *gin.Context) {
 }
 
 func MangaIndex(c *gin.Context) {
-	var manga []models.Manga
-	initializers.DB.Find(&manga)
+	var mangas []models.Manga
+	result := initializers.DB.Preload("Chapters").Preload("Chapters.Pages").Find(&mangas)
 
+	if result.Error != nil {
+		log.Fatal(result.Error)
+	}
+
+	for _, manga := range mangas {
+		log.Printf("Manga: %s", manga.Title)
+		for _, chapter := range manga.Chapters {
+			log.Printf("Chapter: %s", chapter.Number)
+			for _, page := range chapter.Pages {
+				log.Printf("Page: %s", page.Image)
+			}
+		}
+	}
 	c.JSON(200, gin.H{
-		"manga": manga,
+		"manga": mangas,
 	})
 }
 
