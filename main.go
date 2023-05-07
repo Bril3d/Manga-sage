@@ -4,7 +4,6 @@ import (
 	"manga-sage/controllers"
 	"manga-sage/initializers"
 	"manga-sage/models"
-	"manga-sage/scrappers"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -31,10 +30,10 @@ func main() {
 	r.POST("/register", controllers.UserCreate)
 	r.POST("/login", controllers.UserLogin)
 
-	// Scrape AresManga website for new manga chapters
-	go func() {
-		scrappers.ScrapeMangaLoop()
-	}()
+	// // Scrape AresManga website for new manga chapters
+	// go func() {
+	// 	scrappers.ScrapeMangaLoop()
+	// }()
 
 	// Serve downloaded manga chapters
 	r.Static("/mangadownload", "./manga")
