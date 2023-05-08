@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from "../pages/LoginView.vue"
-import FeedView from "../pages/FeedView.vue"
 import RegisterView from "../pages/RegisterView.vue"
 import DashboardLayout from "../pages/dashboard/DashboardLayout.vue"
 
@@ -10,7 +9,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'feed',
-      component: FeedView
+      component: () => import('../pages/FeedView.vue')
     },
     {
       path: '/login',

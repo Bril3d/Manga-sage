@@ -57,8 +57,12 @@ func UserLogin(c *gin.Context) {
 	var user models.User
 	result := initializers.DB.Where(&models.User{Email: body.Email}).First(&user)
 
-	if result.Error != nil || !CheckPasswordHash(body.Password, user.Password) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+	if result.Error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Email Not Found"})
+		return
+	}
+	if !CheckPasswordHash(body.Password, user.Password) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Incorrect Password"})
 		return
 	}
 
