@@ -1,12 +1,13 @@
 <template>
     <div
-      class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-700/[.7]"
-    >
+      class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-700/[.7] "
+    ><div class="overflow-hidden">
       <img
-        class="w-full h-64 rounded-t-xl object-cover"
+        class="w-full h-64 rounded-t-xl object-cover hover:scale-150 transition-all ease-in overflow-hidden"
         :src="`/src/assets/manga/${manga.Cover_Image}`"
         :alt="manga.title"
       />
+    </div>
       <div class="p-4 md:p-5">
         <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ manga.title }}</h3>
         <p class="mt-1 text-gray-800 dark:text-gray-400">
@@ -29,9 +30,6 @@
 export default {
   props: {
     manga: Object
-  },
-  mounted(){
-    console.log(this.manga)
   }
 }
 </script>

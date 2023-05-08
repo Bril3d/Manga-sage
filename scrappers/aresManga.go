@@ -10,6 +10,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -220,9 +221,10 @@ func downloadImage(url string, filename string) error {
 		return err
 	}
 	defer file.Close()
-
+	parts := strings.Split(url, "?")
 	// Download the image and write it to the file
-	resp, err := http.Get(url)
+	resp, err := http.Get(parts[0])
+
 	if err != nil {
 		return err
 	}
