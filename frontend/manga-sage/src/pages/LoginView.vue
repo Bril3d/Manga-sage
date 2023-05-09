@@ -53,7 +53,7 @@
                 </div>
 
                 <!-- Form -->
-                <form @submit.prevent="Login">
+                <form @submit.prevent="login">
                   <div class="grid gap-y-4">
                     <!-- Form Group -->
                     <div>
@@ -87,9 +87,9 @@
                           </svg>
                         </div>
                       </div>
-                      <p v-if="error == 'Email Not Found'" class="text-xs text-red-600 mt-2" id="email-error" >
+                      <!-- <p v-if="error == 'Email Not Found'" class="text-xs text-red-600 mt-2" id="email-error" >
                         {{ error }}
-                      </p>
+                      </p> -->
                     </div>
                     <!-- End Form Group -->
 
@@ -132,9 +132,9 @@
                           </svg>
                         </div>
                       </div>
-                      <p v-if="error == 'Incorrect Password'" class="text-xs text-red-600 mt-2" id="password-error">
+                      <!-- <p v-if="error == 'Incorrect Password'" class="text-xs text-red-600 mt-2" id="password-error">
                         {{ error }}
-                      </p>
+                      </p> -->
                     </div>
                     <!-- End Form Group -->
 
@@ -173,33 +173,20 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { useAuthStore } from '../stores/auth'
 export default {
   data() {
     return {
       email: null,
       password: null,
-      error: null
+      authStore:  useAuthStore()
     }
   },
   methods: {
-    Login() {
-      axios
-        .post('http://localhost:3000/login', {
-          email: this.email,
-          password: this.password
-        })
-        .then((response) => {
-          let { data } = response
-          localStorage.setItem('token', data.token)
-        })
-        .catch((error) => {
-          if (error.response.status == 401) {
-            this.error = error.response.data.error
-          }else {
-            this.error = "Try again later!"
-          }
-        })
+    login() {
+      this.authStore.login(this.email, this.password).then(()=>{
+        this.$router.push({name:"feed"})
+      })
     }
   }
 }

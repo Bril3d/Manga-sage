@@ -30,7 +30,7 @@ func main() {
 	r.POST("/register", controllers.UserCreate)
 	r.POST("/login", controllers.UserLogin)
 
-	// // Scrape AresManga website for new manga chapters
+	// Scrape AresManga website for new manga chapters
 	// go func() {
 	// 	scrappers.ScrapeMangaLoop()
 	// }()

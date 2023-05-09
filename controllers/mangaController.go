@@ -30,20 +30,22 @@ func MangaCreate(c *gin.Context) {
 
 func MangaIndex(c *gin.Context) {
 	var mangas []models.Manga
-	result := initializers.DB.Preload("Chapters").Preload("Chapters.Pages").Find(&mangas)
-
-	if result.Error != nil {
-		log.Fatal(result.Error)
+	err := initializers.DB.Find(&mangas).Error
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	for _, manga := range mangas {
-		log.Printf("Manga: %s", manga.Title)
-		for _, chapter := range manga.Chapters {
-			log.Printf("Chapter: %s", chapter.Number)
-			for _, page := range chapter.Pages {
-				log.Printf("Page: %s", page.Image)
-			}
+	for i := range mangas {
+		var chapters []models.Chapter
+		err := initializers.DB.
+			Where("manga_id = ?", mangas[i].ID).
+			Order("number DESC").
+			Limit(2).
+			Find(&chapters).Error
+		if err != nil {
+			log.Fatal(err)
 		}
+		mangas[i].Chapters = chapters
 	}
 	c.JSON(200, gin.H{
 		"manga": mangas,
