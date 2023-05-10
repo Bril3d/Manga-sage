@@ -30,7 +30,7 @@ func MangaCreate(c *gin.Context) {
 
 func MangaIndex(c *gin.Context) {
 	var mangas []models.Manga
-	err := initializers.DB.Find(&mangas).Error
+	err := initializers.DB.Order("id DESC").Find(&mangas).Error
 	if err != nil {
 		log.Fatal(err)
 	}

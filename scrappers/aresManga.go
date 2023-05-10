@@ -26,9 +26,12 @@ type MangaObject struct {
 func ScrapeMangaLoop() {
 
 	for {
-		Manga := scrapeAresManga("https://aresmanga.net/")
+		Manga := scrapeAresManga("https://aresmanga.net/series/the-lord-coins-arent-decreasing/")
+
 		fmt.Println(Manga)
+
 		for _, m := range Manga {
+
 			var newChapter []models.Chapter
 
 			var chapter string
@@ -98,6 +101,47 @@ func ScrapeMangaLoop() {
 }
 
 func scrapeAresManga(site string) []MangaObject {
+	var Manga []MangaObject
+	var urls []string
+	// Use goquery to scrape AresManga website and extract URLs for new chapters
+	doc, err := goquery.NewDocument(site)
+
+	var newManga MangaObject
+
+	doc.Find("#chapterlist ul li .chbox").Each(func(j int, ts *goquery.Selection) {
+
+		urls = make([]string, 0)
+
+		ts.Find(".eph-num").Each(func(j int, t *goquery.Selection) {
+			chapterLink := t.Find("a")
+			url, exists := chapterLink.Attr("href")
+
+			if exists {
+				urls = append(urls, url)
+			}
+		})
+
+		tselection := doc.Find(".thumb img")
+
+		title, exists := tselection.Attr("title")
+
+		cover, coverExist := tselection.Attr("src")
+
+		if exists && coverExist {
+			newManga = MangaObject{Title: title, Urls: urls, Cover: cover}
+			Manga = append(Manga, newManga)
+		}
+
+	})
+
+	if err != nil {
+		return Manga
+	}
+
+	return Manga
+}
+
+func scrapeLatestAresManga(site string) []MangaObject {
 	var Manga []MangaObject
 	var urls []string
 	// Use goquery to scrape AresManga website and extract URLs for new chapters
