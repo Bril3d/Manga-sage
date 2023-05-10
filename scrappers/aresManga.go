@@ -2,7 +2,7 @@ package scrappers
 
 import (
 	"fmt"
-	"io"
+	"image/jpeg"
 	"log"
 	"manga-sage/initializers"
 	"manga-sage/models"
@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/chai2010/webp"
 )
 
 type MangaObject struct {
@@ -26,7 +27,7 @@ type MangaObject struct {
 func ScrapeMangaLoop() {
 
 	for {
-		Manga := scrapeAresManga("https://aresmanga.net/series/the-lord-coins-arent-decreasing/")
+		Manga := scrapeAresManga("https://aresmanga.net/series/kill-the-dragon/")
 
 		fmt.Println(Manga)
 
@@ -43,7 +44,7 @@ func ScrapeMangaLoop() {
 				chapter, ChapterLength = downloadChapter(u, m.Title)
 				// Create a new Page struct for each page and append it to the slice
 				for i := 0; i < ChapterLength; i++ {
-					filepath := "/" + m.Title + "/" + chapter + "/image" + strconv.Itoa(i) + ".jpg"
+					filepath := "/" + m.Title + "/" + chapter + "/image" + strconv.Itoa(i) + ".webp"
 					page := models.Page{
 						Image: filepath,
 					}
@@ -57,9 +58,9 @@ func ScrapeMangaLoop() {
 				if result.Error != nil {
 					DBresult := initializers.DB.Where("title = ?", m.Title).First(&existingManga)
 					if DBresult.Error != nil {
-						filepath := "./frontend/manga-sage/src/assets/manga/" + m.Title + "/cover.jpg"
+						filepath := "./frontend/manga-sage/src/assets/manga/" + m.Title + "/cover.webp"
 						downloadImage(m.Cover, filepath)
-						Cover_Image := m.Title + "/cover.jpg"
+						Cover_Image := m.Title + "/cover.webp"
 						MangaClone := &models.Manga{
 							Title:       m.Title,
 							Cover_Image: Cover_Image,
@@ -214,7 +215,7 @@ func downloadChapter(url string, title string) (string, int) {
 		src, exists := s.Attr("src")
 		if exists {
 			// Download the image and save it to a file
-			filepath := "./frontend/manga-sage/src/assets/manga/" + title + "/" + chapter + "/image" + strconv.Itoa(i) + ".jpg"
+			filepath := "./frontend/manga-sage/src/assets/manga/" + title + "/" + chapter + "/image" + strconv.Itoa(i) + ".webp"
 			ChapterLength++
 			err = downloadImage(src, filepath)
 
@@ -265,16 +266,25 @@ func downloadImage(url string, filename string) error {
 		return err
 	}
 	defer file.Close()
-	parts := strings.Split(url, "?")
-	// Download the image and write it to the file
-	resp, err := http.Get(parts[0])
 
+	parts := strings.Split(url, "?")
+
+	// Download the image
+	resp, err := http.Get(parts[0])
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	_, err = io.Copy(file, resp.Body)
+	// Decode the image
+	img, err := jpeg.Decode(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	// Encode the image in WebP format
+	options := webp.Options{Lossless: false, Quality: 80}
+	err = webp.Encode(file, img, &options)
 	if err != nil {
 		return err
 	}

@@ -5,7 +5,7 @@
       <img
         class="w-full h-64 rounded-t-xl object-cover hover:scale-150 transition-all ease-in overflow-hidden"
         :src="`/src/assets/manga/${manga.Cover_Image}`"
-        :alt="manga.title"
+        :alt="manga.Title"
       />
     </div>
       <div class="p-4 md:p-5">
