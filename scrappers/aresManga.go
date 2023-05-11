@@ -2,32 +2,27 @@ package scrappers
 
 import (
 	"fmt"
-	"image/jpeg"
 	"log"
 	"manga-sage/initializers"
 	"manga-sage/models"
-	"net/http"
-	"os"
-	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/chai2010/webp"
 )
 
 type MangaObject struct {
-	Title    string
-	Urls     []string
-	Cover    string
-	Chapters []models.Chapter
+	Title       string
+	Urls        []string
+	Cover       string
+	Description string
+	Chapters    []models.Chapter
 }
 
 func ScrapeMangaLoop() {
 
 	for {
-		Manga := scrapeAresManga("https://aresmanga.net/series/kill-the-dragon/")
+		Manga := scrapeAresManga("https://aresmanga.net/series/gods-webnovel/")
 
 		fmt.Println(Manga)
 
@@ -65,6 +60,7 @@ func ScrapeMangaLoop() {
 							Title:       m.Title,
 							Cover_Image: Cover_Image,
 							Chapters:    newChapter,
+							Description: m.Description,
 						}
 
 						result := initializers.DB.Create(MangaClone)
@@ -108,6 +104,15 @@ func scrapeAresManga(site string) []MangaObject {
 	doc, err := goquery.NewDocument(site)
 
 	var newManga MangaObject
+	desc := doc.Find(".entry-content p")
+
+	description := desc.Text()
+
+	tselection := doc.Find(".thumb img")
+
+	title, exists := tselection.Attr("title")
+
+	cover, coverExist := tselection.Attr("src")
 
 	doc.Find("#chapterlist ul li .chbox").Each(func(j int, ts *goquery.Selection) {
 
@@ -122,14 +127,8 @@ func scrapeAresManga(site string) []MangaObject {
 			}
 		})
 
-		tselection := doc.Find(".thumb img")
-
-		title, exists := tselection.Attr("title")
-
-		cover, coverExist := tselection.Attr("src")
-
 		if exists && coverExist {
-			newManga = MangaObject{Title: title, Urls: urls, Cover: cover}
+			newManga = MangaObject{Title: title, Urls: urls, Cover: cover, Description: description}
 			Manga = append(Manga, newManga)
 		}
 
@@ -184,110 +183,4 @@ func scrapeLatestAresManga(site string) []MangaObject {
 	}
 
 	return Manga
-}
-
-func downloadChapter(url string, title string) (string, int) {
-	ChapterLength := 0
-	// Download chapter images from AresManga website and store them in local directory
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", 0
-	}
-	defer resp.Body.Close()
-
-	chapter := getChapterNumber(url)
-
-	// Create directory to store chapter images
-	err = createDirectoryIfNotExist("./frontend/manga-sage/src/assets/manga/" + title + "/" + chapter)
-
-	if err != nil {
-		return "", 0
-	}
-
-	// Parse HTML response
-	doc, err := goquery.NewDocument(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Find all img elements inside #readerarea and extract the src attribute value
-	doc.Find("#readerarea p img").Each(func(i int, s *goquery.Selection) {
-		src, exists := s.Attr("src")
-		if exists {
-			// Download the image and save it to a file
-			filepath := "./frontend/manga-sage/src/assets/manga/" + title + "/" + chapter + "/image" + strconv.Itoa(i) + ".webp"
-			ChapterLength++
-			err = downloadImage(src, filepath)
-
-			if err != nil {
-				log.Println(err)
-			}
-		}
-	})
-
-	return chapter, ChapterLength
-}
-
-func createDirectoryIfNotExist(dir string) error {
-	_, err := os.Stat(string(dir))
-
-	if err == nil {
-		fmt.Println("directory exists " + dir)
-		// directory exists, do nothing
-		return nil
-	}
-	if os.IsNotExist(err) {
-		fmt.Println("directory doesnt exists " + dir)
-		// directory does not exist, create it
-		err = os.MkdirAll(dir, os.ModePerm)
-		if err != nil {
-			return err
-		}
-	} else {
-		// unexpected error occurred while checking if directory exists
-		return err
-	}
-	return nil
-}
-
-func getChapterNumber(url string) string {
-	// Get chapter number from URL
-	re := regexp.MustCompile(`/*-chapter-(\d+)/`)
-	matches := re.FindStringSubmatch(url)
-	if len(matches) != 2 {
-		return ""
-	}
-	return matches[1]
-}
-func downloadImage(url string, filename string) error {
-	// Create the file
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	parts := strings.Split(url, "?")
-
-	// Download the image
-	resp, err := http.Get(parts[0])
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	// Decode the image
-	img, err := jpeg.Decode(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	// Encode the image in WebP format
-	options := webp.Options{Lossless: false, Quality: 80}
-	err = webp.Encode(file, img, &options)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
