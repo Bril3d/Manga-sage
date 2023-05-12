@@ -9,11 +9,7 @@
       />
     </div>
       <div class="p-4 md:p-5">
-        <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ manga.title }}</h3>
-        <p class="mt-1 text-gray-800 dark:text-gray-400">
-          Some quick example text to build on the card title and make up the bulk of the card's
-          content.
-        </p>
+        <h3 dir="ltr" class="text-lg font-bold text-gray-800 dark:text-white truncate">{{ manga.Title }}</h3>
         <div class="flex flex-col gap-2 mt-3">
         <a v-for="chapter in manga.Chapters"
           class="py-3 px-4 inline-flex justify-center items-center rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"

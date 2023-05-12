@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import FeedLayout from './pages/FeedLayout.vue'
+import FeedLayout from './components/FeedLayout.vue'
 import App from './App.vue'
 import router from './router'
 import('preline')
