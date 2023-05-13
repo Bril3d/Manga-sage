@@ -28,7 +28,7 @@ const router = createRouter({
       component: DashboardLayout
     },
     {
-      path: '/series/:title',
+      path: '/series/:id',
       name: 'series',
       component: SeriesView
     },

@@ -35,7 +35,7 @@ export default {
     }
   },
   methods: {
-    async fetchManga() {
+    fetchManga() {
       axios.get('http://localhost:3000/manga').then((response) => {
         let { data } = response
         this.Manga = data.manga

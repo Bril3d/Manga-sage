@@ -1,13 +1,13 @@
 <template>
     <div
       class="flex flex-col bg-white border shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:shadow-slate-700/[.7] "
-    ><div class="overflow-hidden">
+    ><a class="overflow-hidden" :href="`/series/${manga.ID}`">
       <img
         class="w-full h-64 rounded-t-xl object-cover hover:scale-150 transition-all ease-in overflow-hidden"
         :src="`/src/assets/manga/${manga.Cover_Image}`"
         :alt="manga.Title"
       />
-    </div>
+    </a>
       <div class="p-4 md:p-5">
         <h3 dir="ltr" class="text-lg font-bold text-gray-800 dark:text-white truncate">{{ manga.Title }}</h3>
         <div class="flex flex-col gap-2 mt-3">
