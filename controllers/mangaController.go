@@ -52,6 +52,26 @@ func MangaIndex(c *gin.Context) {
 	})
 }
 
+func ChaptersShow(c *gin.Context) {
+	id := c.Param("id")
+
+	type Chapter struct {
+		Number string
+	}
+
+	var chapters []Chapter
+
+	err := initializers.DB.Select("Number").Where("manga_id = ?", id).Find(&chapters).Error
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c.JSON(200, gin.H{
+		"chapters": chapters,
+	})
+}
+
 func MangaShow(c *gin.Context) {
 	id := c.Param("id")
 

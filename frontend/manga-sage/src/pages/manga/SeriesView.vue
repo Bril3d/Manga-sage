@@ -25,7 +25,8 @@ import axios from "axios"
 export default {
   data() {
     return {
-      Serie: []
+      Serie: [],
+      Chapters: []
     }
   },
   methods: {
@@ -35,10 +36,18 @@ export default {
         let { data } = response
         this.Serie = data.manga
       })
+    },
+    getChapters(){
+      let id = this.$route.params.id
+      axios.get(`http://localhost:3000/manga/chapters/${id}`).then((response) => {
+        let { data } = response
+        this.Chapters = data.chapters
+      })
     }
   },
   mounted() {
     this.fetchManga()
+    this.getChapters()
   }
 }
 </script>
