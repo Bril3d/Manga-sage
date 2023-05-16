@@ -4,6 +4,7 @@ import (
 	"log"
 	"manga-sage/initializers"
 	"manga-sage/models"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -66,11 +67,14 @@ func MangaIndex(c *gin.Context) {
 		mangas[i].Chapters = chapters
 	}
 
+	totalPages := int(math.Ceil(float64(count) / float64(limit)))
+
 	c.JSON(200, gin.H{
-		"page":     pageNum,
-		"per_page": limit,
-		"total":    count,
-		"manga":    mangas,
+		"page":       pageNum,
+		"per_page":   limit,
+		"total":      count,
+		"totalPages": totalPages,
+		"manga":      mangas,
 	})
 }
 
