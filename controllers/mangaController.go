@@ -5,6 +5,7 @@ import (
 	"manga-sage/initializers"
 	"manga-sage/models"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,8 +31,24 @@ func MangaCreate(c *gin.Context) {
 }
 
 func MangaIndex(c *gin.Context) {
+	page := c.DefaultQuery("page", "1") // Get the page number from the query parameter
+	limit := 16                         // Number of items per page
+
+	var count int64
+	if err := initializers.DB.Model(&models.Manga{}).Count(&count).Error; err != nil {
+		log.Fatal(err)
+	}
+
+	var offset int64
+	pageNum, err := strconv.ParseInt(page, 10, 64)
+	if err != nil || pageNum < 1 {
+		offset = 0
+	} else {
+		offset = (pageNum - 1) * int64(limit) // Convert limit to int64
+	}
+
 	var mangas []models.Manga
-	err := initializers.DB.Order("id DESC").Find(&mangas).Error
+	err = initializers.DB.Offset(int(offset)).Limit(int(limit)).Order("id DESC").Find(&mangas).Error // Convert offset and limit to int
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,7 +67,10 @@ func MangaIndex(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"manga": mangas,
+		"page":     pageNum,
+		"per_page": limit,
+		"total":    count,
+		"manga":    mangas,
 	})
 }
 

@@ -19,7 +19,7 @@ func main() {
 	r := gin.Default()
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://127.0.0.1:5174"} // Replace with your Vue.js frontend URL
+	config.AllowOrigins = []string{"http://127.0.0.1:5173"} // Replace with your Vue.js frontend URL
 
 	r.Use(cors.New(config))
 	r.POST("/manga", controllers.MangaCreate)

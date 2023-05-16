@@ -23,7 +23,7 @@ export default {
     fetchPages() {
       let id = this.$route.params.id
       let chapter = this.$route.params.chapter
-      axios.get(`http://localhost:3000/manga/${id}/chapter/${chapter}`).then((response) => {
+      axios.get(`${this.$hostname}/manga/${id}/chapter/${chapter}`).then((response) => {
         let { data } = response
         this.Pages = data
       })

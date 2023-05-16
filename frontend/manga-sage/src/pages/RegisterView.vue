@@ -267,7 +267,7 @@ export default {
   },
   methods: {
     Register() {
-      axios.post('http://localhost:3000/register', {
+      axios.post(`${this.$hostname}/register`, {
         username: this.username,
         email: this.email,
         password: this.password

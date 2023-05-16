@@ -44,7 +44,7 @@ export default {
       
     },
     getChapters(){
-      axios.get(`http://localhost:3000/manga/chapters/${this.id}`).then((response) => {
+      axios.get(`${this.$hostname}/manga/chapters/${this.id}`).then((response) => {
         let { data } = response
         this.Chapters = data.chapters
       })
