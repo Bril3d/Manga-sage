@@ -3,6 +3,7 @@ import LoginView from "../pages/LoginView.vue"
 import RegisterView from "../pages/RegisterView.vue"
 import DashboardLayout from "../pages/dashboard/DashboardLayout.vue"
 import SeriesView from "../pages/manga/SeriesView.vue"
+import ChapterView from "../pages/manga/ChapterView.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +33,11 @@ const router = createRouter({
       name: 'series',
       component: SeriesView
     },
+    {
+      path:'/series/:id/:chapter',
+      name:'chapter',
+      component: ChapterView
+    }
   ]
 })
 

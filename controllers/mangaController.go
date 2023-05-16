@@ -4,6 +4,7 @@ import (
 	"log"
 	"manga-sage/initializers"
 	"manga-sage/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -47,6 +48,7 @@ func MangaIndex(c *gin.Context) {
 		}
 		mangas[i].Chapters = chapters
 	}
+
 	c.JSON(200, gin.H{
 		"manga": mangas,
 	})
@@ -70,6 +72,19 @@ func ChaptersShow(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"chapters": chapters,
 	})
+}
+
+func PagesShow(c *gin.Context) {
+	mangaID := c.Param("id")
+	chapterID := c.Param("chapter")
+
+	var chapter models.Chapter
+	if err := initializers.DB.Preload("Pages").Where("Number = ? AND manga_id = ?", chapterID, mangaID).First(&chapter).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Chapter not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, chapter.Pages)
 }
 
 func MangaShow(c *gin.Context) {

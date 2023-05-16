@@ -17,15 +17,16 @@ func init() {
 
 func main() {
 	r := gin.Default()
+
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://127.0.0.1:5173"}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	config.AllowCredentials = true
+	config.AllowOrigins = []string{"http://127.0.0.1:5174"} // Replace with your Vue.js frontend URL
+
 	r.Use(cors.New(config))
 	r.POST("/manga", controllers.MangaCreate)
 	r.GET("/manga", controllers.MangaIndex)
 	r.GET("/manga/:id", controllers.MangaShow)
 	r.GET("/manga/chapters/:id", controllers.ChaptersShow)
+	r.GET("/manga/:id/chapter/:chapter", controllers.PagesShow)
 	r.PUT("/manga/:id", controllers.MangaUpdate)
 	r.DELETE("/manga/:id", controllers.MangaDelete)
 	r.POST("/register", controllers.UserCreate)
