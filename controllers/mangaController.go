@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func MangaCreate(c *gin.Context) {
@@ -54,19 +55,12 @@ func MangaIndex(c *gin.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
-	for i := range mangas {
-		var chapters []models.Chapter
-		err := initializers.DB.
-			Where("manga_id = ?", mangas[i].ID).
-			Order("number DESC").
-			Limit(2).
-			Find(&chapters).Error
-		if err != nil {
-			log.Fatal(err)
-		}
-		mangas[i].Chapters = chapters
-	}
+
+	initializers.DB.Model(&models.Manga{}).Preload("Chapters", func(tx *gorm.DB) *gorm.DB {
+		return tx.Joins(`JOIN LATERAL (
+				SELECT c.id FROM Chapters c WHERE c.manga_id = chapters.manga_id ORDER BY c.manga_id DESC LIMIT 2
+				) AS ch ON ch.id = chapters.id`)
+	}).Find(&mangas)
 
 	totalPages := int(math.Ceil(float64(count) / float64(limit)))
 
