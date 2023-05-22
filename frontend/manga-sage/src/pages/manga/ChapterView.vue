@@ -1,22 +1,36 @@
 <template>
   <FeedLayout>
     <div class="py-5 text-center font-bold text-3xl text-white">
-      <h1>{{ mangaStore.Manga.Title }}</h1>
+      <h1>{{ getMangaName }}</h1>
     </div>
     <div class="flex flex-col">
-      <img class="mx-auto" v-for="page in Pages" :src="`/src/assets/manga/${page.Image}`" alt="Manga Page" />
+      <img
+        class="mx-auto"
+        v-for="page in Pages"
+        :src="`/src/assets/manga/${page.Image}`"
+        alt="Manga Page"
+      />
     </div>
   </FeedLayout>
 </template>
 
 <script>
-import axios from "axios"
-import { useMangaStore } from '../../stores/manga'
+import axios from 'axios'
 export default {
   data() {
     return {
-      mangaStore:  useMangaStore(),
-      Pages:[]
+      Pages: null
+    }
+  },
+  computed: {
+    getMangaName() {
+      if(this.Pages){
+      const regex = /\/([^/]+)\//
+      const string = this.Pages[0]?.Image
+      const match = string.match(regex)
+      const result = match ? match[1] : null
+      return result
+    }
     }
   },
   methods: {
@@ -29,7 +43,7 @@ export default {
       })
     }
   },
-  mounted() {
+  created() {
     this.fetchPages()
   }
 }
