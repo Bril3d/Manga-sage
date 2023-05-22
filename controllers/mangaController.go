@@ -46,21 +46,19 @@ func MangaIndex(c *gin.Context) {
 	if err != nil || pageNum < 1 {
 		offset = 0
 	} else {
-		offset = (pageNum - 1) * int64(limit) // Convert limit to int64
+		offset = (pageNum - 1) * int64(limit) // Calculate the offset
 	}
 
 	var mangas []models.Manga
 
-	err = initializers.DB.Offset(int(offset)).Limit(int(limit)).Order("id DESC").Find(&mangas).Error // Convert offset and limit to int
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	initializers.DB.Model(&models.Manga{}).Preload("Chapters", func(tx *gorm.DB) *gorm.DB {
+	err = initializers.DB.Model(&models.Manga{}).Preload("Chapters", func(tx *gorm.DB) *gorm.DB {
 		return tx.Joins(`JOIN LATERAL (
 				SELECT c.id FROM Chapters c WHERE c.manga_id = chapters.manga_id ORDER BY c.manga_id DESC LIMIT 2
 				) AS ch ON ch.id = chapters.id`)
-	}).Find(&mangas)
+	}).Offset(int(offset)).Limit(int(limit)).Order("id DESC").Find(&mangas).Error
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	totalPages := int(math.Ceil(float64(count) / float64(limit)))
 
